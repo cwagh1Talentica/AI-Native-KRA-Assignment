@@ -1,0 +1,14 @@
+{
+  "fallback_catalog": [
+    {"method": "GET", "path": "/users/v1", "summary": "List all users", "auth_required": true},
+    {"method": "POST", "path": "/users/v1/register", "summary": "Register a new user", "auth_required": false},
+    {"method": "POST", "path": "/users/v1/login", "summary": "Authenticate a user", "auth_required": false},
+    {"method": "GET", "path": "/users/v1/{user_id}", "summary": "Get user details", "auth_required": true},
+    {"method": "DELETE", "path": "/users/v1/{user_id}", "summary": "Delete a user account", "auth_required": true},
+    {"method": "PUT", "path": "/users/v1/{user_id}/email", "summary": "Update a user email", "auth_required": true},
+    {"method": "PUT", "path": "/users/v1/{user_id}/password", "summary": "Update a user password", "auth_required": true},
+    {"method": "GET", "path": "/books/v1", "summary": "List all books", "auth_required": false},
+    {"method": "POST", "path": "/books/v1", "summary": "Add a new book", "auth_required": true},
+    {"method": "GET", "path": "/books/v1/{book_title}", "summary": "Get a book by title", "auth_required": false}
+  ]
+}

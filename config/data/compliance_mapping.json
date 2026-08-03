@@ -1,0 +1,52 @@
+{
+  "API1: Broken Object Level Authorization": {
+    "legacy_2019": "API1:2019 - Broken Object Level Authorization",
+    "nist": ["AC-3", "AC-6"],
+    "iso27001": ["A.5.15", "A.8.2"]
+  },
+  "API2: Broken Authentication": {
+    "legacy_2019": "API2:2019 - Broken User Authentication",
+    "nist": ["IA-2", "IA-5"],
+    "iso27001": ["A.5.17", "A.8.5"]
+  },
+  "API3: Excessive Data Exposure": {
+    "legacy_2019": "API3:2019 - Excessive Data Exposure",
+    "nist": ["SC-28", "AC-4"],
+    "iso27001": ["A.5.34", "A.8.12"]
+  },
+  "API4: Unrestricted Resource Consumption": {
+    "legacy_2019": "API4:2019 - Lack of Resources & Rate Limiting",
+    "nist": ["SC-5", "SI-10"],
+    "iso27001": ["A.8.6", "A.8.16"]
+  },
+  "API5: Broken Function Level Authorization": {
+    "legacy_2019": "API5:2019 - Broken Function Level Authorization",
+    "nist": ["AC-3", "AC-6"],
+    "iso27001": ["A.8.2", "A.8.18"]
+  },
+  "API6: Mass Assignment": {
+    "legacy_2019": "API6:2019 - Mass Assignment",
+    "nist": ["CM-7", "SI-10"],
+    "iso27001": ["A.8.26", "A.8.28"]
+  },
+  "API7: Security Misconfiguration": {
+    "legacy_2019": "API7:2019 - Security Misconfiguration",
+    "nist": ["CM-2", "CM-6"],
+    "iso27001": ["A.8.9", "A.8.27"]
+  },
+  "API8: Injection": {
+    "legacy_2019": "API8:2019 - Injection",
+    "nist": ["SI-10", "SA-11"],
+    "iso27001": ["A.8.28", "A.8.31"]
+  },
+  "API9: Improper Inventory Management": {
+    "legacy_2019": "API9:2019 - Improper Assets Management",
+    "nist": ["CM-8", "PM-5"],
+    "iso27001": ["A.5.9", "A.8.8"]
+  },
+  "API10: Unsafe Consumption of APIs": {
+    "legacy_2019": "API10:2019 - Insufficient Logging & Monitoring",
+    "nist": ["SA-9", "SR-3"],
+    "iso27001": ["A.5.19", "A.5.21"]
+  }
+}

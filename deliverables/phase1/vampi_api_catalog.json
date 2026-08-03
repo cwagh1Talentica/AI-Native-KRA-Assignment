@@ -1,0 +1,239 @@
+{
+  "base_url": "http://localhost:5000",
+  "endpoints": [
+    {
+      "auth_required": false,
+      "category": "book-management",
+      "method": "GET",
+      "parameters": [],
+      "path": "/books/v1",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Retrieves all books"
+    },
+    {
+      "auth_required": true,
+      "category": "book-management",
+      "method": "GET",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "book_title",
+          "required": true,
+          "schema": {
+            "example": "bookTitle77",
+            "type": "string"
+          }
+        }
+      ],
+      "path": "/books/v1/{book_title}",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Retrieves book by title along with secret"
+    },
+    {
+      "auth_required": true,
+      "category": "book-management",
+      "method": "POST",
+      "parameters": [],
+      "path": "/books/v1",
+      "risk": "high",
+      "source": "openapi",
+      "summary": "Add new book"
+    },
+    {
+      "auth_required": false,
+      "category": "general",
+      "method": "GET",
+      "parameters": [],
+      "path": "/",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "VAmPI home"
+    },
+    {
+      "auth_required": false,
+      "category": "general",
+      "method": "GET",
+      "parameters": [],
+      "path": "/createdb",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Creates and populates the database with dummy data"
+    },
+    {
+      "auth_required": true,
+      "category": "general",
+      "method": "GET",
+      "parameters": [],
+      "path": "/me",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Retrieves currently logged in user"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "DELETE",
+      "parameters": [],
+      "path": "/users/v1/{user_id}",
+      "risk": "high",
+      "source": "fallback",
+      "summary": "Delete a user account"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "DELETE",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "schema": {
+            "example": "name1",
+            "type": "string"
+          }
+        }
+      ],
+      "path": "/users/v1/{username}",
+      "risk": "high",
+      "source": "openapi",
+      "summary": "Deletes user by username (Only Admins)"
+    },
+    {
+      "auth_required": false,
+      "category": "user-management",
+      "method": "GET",
+      "parameters": [],
+      "path": "/users/v1",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Retrieves all users"
+    },
+    {
+      "auth_required": false,
+      "category": "user-management",
+      "method": "GET",
+      "parameters": [],
+      "path": "/users/v1/_debug",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Retrieves all details for all users"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "GET",
+      "parameters": [],
+      "path": "/users/v1/{user_id}",
+      "risk": "medium",
+      "source": "fallback",
+      "summary": "Get user details"
+    },
+    {
+      "auth_required": false,
+      "category": "user-management",
+      "method": "GET",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "schema": {
+            "example": "name1",
+            "type": "string"
+          }
+        }
+      ],
+      "path": "/users/v1/{username}",
+      "risk": "medium",
+      "source": "openapi",
+      "summary": "Retrieves user by username"
+    },
+    {
+      "auth_required": false,
+      "category": "user-management",
+      "method": "POST",
+      "parameters": [],
+      "path": "/users/v1/login",
+      "risk": "high",
+      "source": "openapi",
+      "summary": "Login to VAmPI"
+    },
+    {
+      "auth_required": false,
+      "category": "user-management",
+      "method": "POST",
+      "parameters": [],
+      "path": "/users/v1/register",
+      "risk": "high",
+      "source": "openapi",
+      "summary": "Register new user"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "PUT",
+      "parameters": [],
+      "path": "/users/v1/{user_id}/email",
+      "risk": "high",
+      "source": "fallback",
+      "summary": "Update a user email"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "PUT",
+      "parameters": [],
+      "path": "/users/v1/{user_id}/password",
+      "risk": "high",
+      "source": "fallback",
+      "summary": "Update a user password"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "PUT",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "schema": {
+            "example": "name1",
+            "type": "string"
+          }
+        }
+      ],
+      "path": "/users/v1/{username}/email",
+      "risk": "high",
+      "source": "openapi",
+      "summary": "Update users email"
+    },
+    {
+      "auth_required": true,
+      "category": "user-management",
+      "method": "PUT",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "username",
+          "required": true,
+          "schema": {
+            "example": "name1",
+            "type": "string"
+          }
+        }
+      ],
+      "path": "/users/v1/{username}/password",
+      "risk": "high",
+      "source": "openapi",
+      "summary": "Update users password"
+    }
+  ],
+  "notes": [
+    "Discovered OpenAPI/Swagger specification and merged with the VAmPI fallback catalog."
+  ],
+  "source": "openapi+fallback"
+}

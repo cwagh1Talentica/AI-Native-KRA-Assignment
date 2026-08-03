@@ -1,0 +1,10 @@
+{
+  "jwt_max_ttl_seconds": 86400,
+  "weak_password_candidates": ["12345", "password", "qwerty"],
+  "rate_limit_probe_attempts": 5,
+  "sensitive_keys": ["password", "passwd", "hash", "token", "jwt", "secret", "admin", "is_admin", "role"],
+  "sql_error_markers": ["sql", "syntax error", "sqlite", "mysql", "postgres", "psycopg", "odbc", "database error"],
+  "misconfiguration_probe_paths": ["/users/v1", "/books/v1", "/"],
+  "inventory_probe_paths": ["/api/v1/users", "/api/v1/books", "/users/v2", "/books/v2", "/v2/users/v1", "/v2/books/v1"],
+  "collection_endpoint_suffix": "/v1"
+}
