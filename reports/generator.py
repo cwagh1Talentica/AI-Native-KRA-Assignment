@@ -141,10 +141,29 @@ class SecurityReportGenerator:
         return playbook
 
     def _render_html(self, payload: Dict[str, object]) -> str:
+        from security_agent.pdf_report_generator import EnhancedPDFReportGenerator, PDFChartGenerator
+        
         discovery = cast(Dict[str, Any], payload["discovery"])
         assessment = cast(Dict[str, Any], payload["assessment"])
         summary = cast(Dict[str, Any], payload["summary"])
         findings = cast(List[Dict[str, Any]], assessment["findings"])
+        
+        severity_counts = {}
+        cvss_scores = []
+        endpoint_counts: Dict[str, int] = {}
+        
+        for finding in findings:
+            sev = finding.get("severity", "medium")
+            severity_counts[sev] = severity_counts.get(sev, 0) + 1
+            cvss_scores.append(finding.get("cvss_score", 5.0))
+            endpoint = finding.get("endpoint", "unknown")
+            endpoint_counts[endpoint] = endpoint_counts.get(endpoint, 0) + 1
+        
+        chart_gen = PDFChartGenerator()
+        severity_pie = chart_gen.generate_severity_pie_chart(severity_counts)
+        cvss_dist = chart_gen.generate_cvss_distribution_chart(cvss_scores)
+        endpoint_heatmap = chart_gen.generate_endpoint_risk_heatmap(list(endpoint_counts.keys()), endpoint_counts)
+        
         endpoint_rows = "".join(
             f"<tr><td>{html.escape(item['method'])}</td><td>{html.escape(item['path'])}</td><td>{html.escape(item.get('category', ''))}</td><td>{html.escape(item.get('risk', ''))}</td></tr>"
             for item in cast(List[Dict[str, Any]], discovery["endpoints"])
@@ -167,33 +186,62 @@ class SecurityReportGenerator:
   <meta charset="utf-8">
   <title>VAmPI Security Assessment</title>
   <style>
-    body {{ font-family: Arial, sans-serif; margin: 2rem; color: #1f2937; }}
+    body {{ font-family: Arial, sans-serif; margin: 2rem; color: #1f2937; background: #ffffff; }}
     table {{ border-collapse: collapse; width: 100%; margin-bottom: 1.5rem; }}
     th, td {{ border: 1px solid #d1d5db; padding: 0.5rem; text-align: left; vertical-align: top; }}
-    th {{ background: #f3f4f6; }}
-    .summary {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }}
+    th {{ background: #f3f4f6; font-weight: bold; }}
+    .summary {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 2rem; }}
     .card {{ background: #f9fafb; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; }}
+    .chart-section {{ background: #f5f5f5; padding: 1.5rem; margin: 1.5rem 0; border-radius: 0.5rem; border: 1px solid #e5e7eb; }}
+    .chart-title {{ font-weight: bold; margin-bottom: 1rem; font-size: 1.1rem; }}
+    svg {{ display: block; margin: 0 auto; }}
+    .finding-critical {{ background: #fee2e2; }}
+    .finding-high {{ background: #fef3c7; }}
+    .finding-medium {{ background: #fde68a; }}
+    .finding-low {{ background: #dbeafe; }}
+    page-break-after {{ page-break-after: always; }}
+    h1 {{ color: #111827; border-bottom: 2px solid #1f2937; padding-bottom: 0.5rem; }}
+    h2 {{ color: #374151; margin-top: 2rem; }}
   </style>
 </head>
 <body>
-  <h1>VAmPI Security Assessment</h1>
+  <h1>VAmPI Security Assessment Report</h1>
   <p><strong>Target:</strong> {html.escape(str(payload["target"]))}</p>
   <p><strong>Generated:</strong> {html.escape(str(payload["generated_at"]))}</p>
+  
+  <h2>Executive Summary</h2>
   <div class="summary">
-    <div class="card"><strong>Endpoints</strong><br>{summary["endpoint_count"]}</div>
-    <div class="card"><strong>Findings</strong><br>{summary["finding_count"]}</div>
-    <div class="card"><strong>Risk Summary</strong><ul>{risk_summary}</ul></div>
+    <div class="card"><strong>Total Endpoints</strong><br>{summary["endpoint_count"]}</div>
+    <div class="card"><strong>Total Findings</strong><br>{summary["finding_count"]}</div>
+    <div class="card"><strong>Risk Distribution</strong><ul>{risk_summary}</ul></div>
   </div>
+  
+  <h2>Security Findings Visualization</h2>
+  <div class="chart-section">
+    <div class="chart-title">Severity Distribution</div>
+    {severity_pie}
+  </div>
+  <div class="chart-section">
+    <div class="chart-title">CVSS Score Distribution</div>
+    {cvss_dist}
+  </div>
+  <div class="chart-section">
+    <div class="chart-title">Endpoint Risk Heatmap</div>
+    {endpoint_heatmap}
+  </div>
+  
   <h2>Discovered Endpoints</h2>
   <table>
     <thead><tr><th>Method</th><th>Path</th><th>Category</th><th>Risk</th></tr></thead>
     <tbody>{endpoint_rows}</tbody>
   </table>
+  
   <h2>Security Findings</h2>
   <table>
     <thead><tr><th>Severity</th><th>Title</th><th>Endpoint</th><th>CVSS</th></tr></thead>
     <tbody>{finding_rows}</tbody>
   </table>
+  
   <h2>Compliance Mapping</h2>
   <table>
     <thead><tr><th>OWASP API</th><th>OWASP API 2019</th><th>NIST 800-53</th><th>ISO 27001</th></tr></thead>

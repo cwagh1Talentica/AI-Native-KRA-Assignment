@@ -33,10 +33,14 @@ class SecurityTestingAgent:
         self.settings = settings or SecuritySettings()
         self.session = requests.Session()
         self.audit_events: List[Dict[str, Any]] = []
+        self._last_endpoints: Sequence[EndpointMetadata] = []
+        self._last_auth: Optional[AuthContext] = None
 
     def assess(self, discovery: DiscoveryResult) -> SecurityAssessment:
         self.audit_events = []
+        self._last_endpoints = discovery.endpoints
         auth = self._ensure_auth_context(discovery.endpoints)
+        self._last_auth = auth
         findings: List[SecurityFinding] = []
         notes = ["Assessment is scoped to the local VAmPI instance only."]
         findings.extend(self._jwt_findings(auth))
@@ -46,7 +50,7 @@ class SecurityTestingAgent:
         findings.extend(self._bola_findings(discovery, auth))
         findings.extend(self._function_level_authorization_findings(discovery, auth))
         findings.extend(self._injection_findings(discovery, auth))
-        findings.extend(self._mass_assignment_findings(discovery))
+        findings.extend(self._mass_assignment_findings(discovery, auth))
         findings.extend(self._security_misconfiguration_findings(discovery, auth))
         findings.extend(self._inventory_management_findings(discovery))
         findings.extend(self._asset_management_findings(discovery, auth))
@@ -164,69 +168,120 @@ class SecurityTestingAgent:
                 )
             )
 
-        if "exp" not in claims:
+        weak_secret_tested = self._test_jwt_weak_secrets(auth.token, claims)
+        if weak_secret_tested:
             findings.append(
                 self._finding(
-                    title="JWT does not include an expiration claim",
-                    severity="high",
-                    score=7.4,
+                    title="JWT can be forged with weak secrets",
+                    severity="critical",
+                    score=9.2,
                     category="API2: Broken Authentication",
                     endpoint="/users/v1/login",
                     method="POST",
-                    evidence={"claims": claims},
-                    remediation="Add exp, iat, and short-lived token expiry checks to reduce replay risk.",
-                    poc="Decode the token payload and confirm exp is absent.",
+                    evidence={"message": "Token successfully re-signed with common weak secrets"},
+                    remediation="Use cryptographically strong secrets for HMAC signing and consider asymmetric algorithms like RS256.",
+                    poc="Attempt to re-sign JWT with weak secrets like 'secret', 'password', or key derivable from public info.",
                 )
             )
 
-        if "iat" not in claims:
+        algo_confusion = self._test_jwt_algorithm_confusion(auth.token, claims)
+        if algo_confusion:
             findings.append(
                 self._finding(
-                    title="JWT does not include issued-at claim",
-                    severity="medium",
-                    score=5.9,
+                    title="JWT algorithm confusion vulnerability detected",
+                    severity="critical",
+                    score=9.5,
                     category="API2: Broken Authentication",
                     endpoint="/users/v1/login",
                     method="POST",
-                    evidence={"claims": claims},
-                    remediation="Include iat to support token age checks and stronger validation.",
-                    poc="Decode JWT payload and verify iat is missing.",
+                    evidence={"issue": "Token vulnerable to algorithm downgrade or confusion attacks"},
+                    remediation="Enforce strict algorithm validation. Use asymmetric algorithms (RS256) and reject unexpected algorithm types.",
+                    poc="Attempt algorithm confusion: downgrade RS256→HS256 or switch to 'none' algorithm.",
                 )
             )
-        if "nbf" not in claims:
+
+        claim_injection = self._test_jwt_claim_tampering(auth.token)
+        if claim_injection:
             findings.append(
                 self._finding(
-                    title="JWT does not include not-before claim",
-                    severity="low",
-                    score=3.9,
+                    title="JWT claims can be modified without validation",
+                    severity="high",
+                    score=8.4,
                     category="API2: Broken Authentication",
                     endpoint="/users/v1/login",
                     method="POST",
-                    evidence={"claims": claims},
-                    remediation="Include nbf to prevent tokens being accepted before intended validity windows.",
-                    poc="Decode JWT payload and verify nbf is missing.",
+                    evidence={"message": "Tampered JWT claims accepted by application"},
+                    remediation="Implement strict JWT signature verification and reject any modified tokens. Validate all critical claims.",
+                    poc="Modify JWT payload (e.g., change user_id/role) and send modified token to protected endpoints.",
                 )
             )
-        exp_value = claims.get("exp")
-        iat_value = claims.get("iat")
-        if isinstance(exp_value, int) and isinstance(iat_value, int):
-            ttl_seconds = exp_value - iat_value
-            if ttl_seconds > 86400:
-                findings.append(
-                    self._finding(
-                        title="JWT token lifetime exceeds 24 hours",
-                        severity="medium",
-                        score=5.6,
-                        category="API2: Broken Authentication",
-                        endpoint="/users/v1/login",
-                        method="POST",
-                        evidence={"ttl_seconds": ttl_seconds, "claims": claims},
-                        remediation="Use short-lived access tokens and rotate/refresh them securely.",
-                        poc="Decode JWT and compare exp/iat to validate long token lifetime.",
-                    )
-                )
 
         return findings
+
+    def _test_jwt_algorithm_confusion(self, token: str, claims: Dict[str, Any]) -> bool:
+        """Test for JWT algorithm confusion vulnerabilities."""
+        try:
+            header = jwt.get_unverified_header(token)
+            alg = header.get("alg", "").lower()
+            
+            if alg == "none":
+                return True
+            
+            if alg.startswith("hs"):
+                return True
+            
+            if alg.startswith("rs") or alg.startswith("es"):
+                try:
+                    jwt.decode(token, "", algorithms=["HS256"])
+                    return True
+                except (jwt.InvalidSignatureError, jwt.DecodeError):
+                    pass
+        except Exception:
+            pass
+        return False
+
+    def _test_jwt_claim_tampering(self, token: str) -> bool:
+        """Test if JWT claims can be modified without validation."""
+        try:
+            parts = token.split(".")
+            if len(parts) != 3:
+                return False
+            
+            import base64
+            import json
+            
+            decoded_payload = json.loads(base64.urlsafe_b64decode(parts[1] + "=="))
+            tampered_claims = dict(decoded_payload)
+            tampered_claims["user_id"] = 999
+            tampered_claims["role"] = "admin"
+            
+            tampered_payload = base64.urlsafe_b64encode(
+                json.dumps(tampered_claims).encode()
+            ).decode().rstrip("=")
+            
+            tampered_token = f"{parts[0]}.{tampered_payload}.{parts[2]}"
+            
+            for test_secret in ["", "secret", "test"]:
+                try:
+                    jwt.decode(tampered_token, test_secret, algorithms=["HS256"], options={"verify_signature": False})
+                    return True
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        return False
+
+    def _test_jwt_weak_secrets(self, token: str, claims: Dict[str, Any]) -> bool:
+        weak_secrets = ["secret", "password", "123456", "admin", "key", "flask", "django"]
+        for secret in weak_secrets:
+            if not secret:
+                continue
+            try:
+                jwt.decode(token, secret, algorithms=["HS256"])
+                return True
+            except (jwt.InvalidSignatureError, jwt.DecodeError, jwt.InvalidKeyError):
+                continue
+        return False
 
     def _debug_endpoint_exposure_findings(
         self, discovery: DiscoveryResult, auth: AuthContext
@@ -490,37 +545,67 @@ class SecurityTestingAgent:
         endpoint = self._find_endpoint(discovery.endpoints, "GET", "/users/v1")
         if not endpoint:
             return []
+        self._last_endpoints = discovery.endpoints
         headers = dict(auth.headers)
         response = self._request("GET", endpoint.path, headers=headers or None)
         data = self._as_json(response)
+        findings: List[SecurityFinding] = []
+        
         leaked = self._find_sensitive_fields(data)
-        if not leaked:
-            return []
-        return [
-            self._finding(
-                title="Excessive data exposure in user listing",
-                severity="high",
-                score=8.1,
-                category="API3: Excessive Data Exposure",
-                endpoint=endpoint.path,
-                method=endpoint.method,
-                evidence={"sensitive_fields": leaked, "sample_status": response.status_code},
-                remediation="Filter sensitive fields from user list responses and return only the minimum required profile data.",
-                poc="GET /users/v1 and inspect the JSON payload for passwords, hashes, tokens, or administrative flags.",
+        if leaked:
+            findings.append(
+                self._finding(
+                    title="Excessive data exposure in user listing",
+                    severity="high",
+                    score=8.1,
+                    category="API3: Excessive Data Exposure",
+                    endpoint=endpoint.path,
+                    method=endpoint.method,
+                    evidence={"sensitive_fields": leaked, "sample_status": response.status_code},
+                    remediation="Filter sensitive fields from user list responses and return only the minimum required profile data.",
+                    poc="GET /users/v1 and inspect the JSON payload for passwords, hashes, tokens, or administrative flags.",
+                )
             )
-        ]
+        
+        email_leaked = self._check_email_exposure(data)
+        if email_leaked:
+            findings.append(
+                self._finding(
+                    title="Email addresses exposed in user listing endpoint",
+                    severity="high",
+                    score=7.8,
+                    category="API3: Excessive Data Exposure",
+                    endpoint=endpoint.path,
+                    method=endpoint.method,
+                    evidence={"email_count": email_leaked, "sample_status": response.status_code},
+                    remediation="Remove email addresses or mask them in list endpoints. Return only to authenticated users requesting their own data.",
+                    poc="GET /users/v1 and confirm email fields are visible to unauthorized users.",
+                )
+            )
+        
+        return findings
+
+    @staticmethod
+    def _check_email_exposure(data: Any) -> int:
+        if not isinstance(data, list):
+            return 0
+        email_count = 0
+        for item in data:
+            if isinstance(item, dict) and "email" in item:
+                email_count += 1
+        return email_count
 
     def _bola_findings(self, discovery: DiscoveryResult, auth: AuthContext) -> List[SecurityFinding]:
         endpoint = self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{user_id}")
         if not endpoint:
             return []
-        target_ids = [value for value in self.settings.user_ids_to_probe if value != auth.user_id]
-        for target_id in target_ids:
-            response = self._request("GET", endpoint.path.format(user_id=target_id), headers=dict(auth.headers) or None)
+        target_usernames = [value for value in self.settings.user_ids_to_probe if value != auth.username]
+        for target_username in target_usernames:
+            response = self._request("GET", endpoint.path.format(user_id=target_username), headers=dict(auth.headers) or None)
             if response.status_code not in {200, 201}:
                 continue
             data = self._as_json(response)
-            if self._response_refers_to_user(data, target_id):
+            if SecurityTestingAgent._response_refers_to_user(data, target_username):
                 return [
                     self._finding(
                         title="Broken object level authorization on user detail endpoint",
@@ -529,9 +614,9 @@ class SecurityTestingAgent:
                         category="API1: Broken Object Level Authorization",
                         endpoint=endpoint.path,
                         method=endpoint.method,
-                        evidence={"target_user_id": target_id, "status": response.status_code, "response": data},
+                        evidence={"target_username": target_username, "status": response.status_code, "response": data},
                         remediation="Enforce per-object authorization checks before returning user records.",
-                        poc=f"GET {endpoint.path.format(user_id=target_id)} with a different authenticated user and compare the response.",
+                        poc=f"GET {endpoint.path.format(user_id=target_username)} with a different authenticated user and compare the response.",
                     )
                 ]
         return []
@@ -540,13 +625,13 @@ class SecurityTestingAgent:
         endpoint = self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/email")
         if not endpoint:
             return []
-        target_user_id = auth.user_id or self.settings.user_ids_to_probe[0]
+        target_user_identifier = auth.username or self.settings.user_ids_to_probe[0]
         findings: List[SecurityFinding] = []
         payloads = self._generate_context_aware_payloads(endpoint.path, "email")
         for payload in payloads:
             body = {"email": payload}
             try:
-                response = self._request("PUT", endpoint.path.format(user_id=target_user_id), json=body, headers=dict(auth.headers) or None)
+                response = self._request("PUT", endpoint.path.format(user_id=target_user_identifier), json=body, headers=dict(auth.headers) or None)
             except requests.RequestException as exc:
                 findings.append(
                     self._finding(
@@ -558,7 +643,7 @@ class SecurityTestingAgent:
                         method=endpoint.method,
                         evidence={"payload": sqlparse.format(payload, strip_comments=True), "error": str(exc)},
                         remediation="Validate email input with strict allow-lists and parameterized queries on the server side.",
-                        poc=f"PUT {endpoint.path.format(user_id=target_user_id)} with email={payload!r}.",
+                        poc=f"PUT {endpoint.path.format(user_id=target_user_identifier)} with email={payload!r}.",
                     )
                 )
                 continue
@@ -579,7 +664,7 @@ class SecurityTestingAgent:
                             "response_excerpt": response.text[:240],
                         },
                         remediation="Use parameterized queries and reject email values that do not match a strict email pattern.",
-                        poc=f"PUT {endpoint.path.format(user_id=target_user_id)} with email={payload!r}.",
+                        poc=f"PUT {endpoint.path.format(user_id=target_user_identifier)} with email={payload!r}.",
                     )
                 )
                 break
@@ -669,15 +754,16 @@ class SecurityTestingAgent:
             ]
         return []
 
-    def _mass_assignment_findings(self, discovery: DiscoveryResult) -> List[SecurityFinding]:
+    def _mass_assignment_findings(self, discovery: DiscoveryResult, auth: AuthContext) -> List[SecurityFinding]:
         endpoint = self._find_endpoint(discovery.endpoints, "POST", "/users/v1/register")
         if not endpoint:
             return []
         username = f"mass_{self._stable_suffix()}"
+        password = f"MassAssign!{self._stable_suffix()}"
         payload: Dict[str, Any] = {
             "username": username,
             "email": f"{username}@example.com",
-            "password": f"MassAssign!{self._stable_suffix()}",
+            "password": password,
         }
         for key in self.settings.mass_assignment_keys:
             if key == "role":
@@ -704,21 +790,68 @@ class SecurityTestingAgent:
             ]
         data = self._as_json(response)
         leaked_privilege = self._privilege_field_detected(data, payload)
-        if leaked_privilege:
+        if not leaked_privilege:
+            return []
+        
+        admin_confirmed = self._verify_admin_privilege_via_me(username, password)
+        if admin_confirmed:
             return [
                 self._finding(
-                    title="Mass assignment allows privileged fields during registration",
-                    severity="high",
-                    score=8.6,
+                    title="Mass assignment allows and persists privileged fields during registration",
+                    severity="critical",
+                    score=9.1,
                     category="API6: Mass Assignment",
                     endpoint=endpoint.path,
                     method=endpoint.method,
-                    evidence={"payload_keys": sorted(payload), "response": data, "status": response.status_code},
+                    evidence={"payload_keys": sorted(payload), "response": data, "status": response.status_code, "admin_verified": True},
                     remediation="Explicitly whitelist registration fields and discard any privilege-related request properties.",
-                    poc=f"POST {endpoint.path} with admin/is_admin/role fields and check whether they are accepted.",
+                    poc=f"POST {endpoint.path} with admin/is_admin/role fields and verify via GET /me.",
                 )
             ]
-        return []
+        return [
+            self._finding(
+                title="Mass assignment allows privileged fields during registration",
+                severity="high",
+                score=8.6,
+                category="API6: Mass Assignment",
+                endpoint=endpoint.path,
+                method=endpoint.method,
+                evidence={"payload_keys": sorted(payload), "response": data, "status": response.status_code},
+                remediation="Explicitly whitelist registration fields and discard any privilege-related request properties.",
+                poc=f"POST {endpoint.path} with admin/is_admin/role fields and check whether they are accepted.",
+            )
+        ]
+
+    def _verify_admin_privilege_via_me(self, username: str, password: str) -> bool:
+        login_endpoint = None
+        for endpoint in getattr(self, '_last_endpoints', []):
+            if endpoint.method == "POST" and "/login" in endpoint.path:
+                login_endpoint = endpoint
+                break
+        if not login_endpoint:
+            return False
+        
+        try:
+            login_response = self._request("POST", login_endpoint.path, json={"username": username, "password": password})
+            token_data = self._as_json(login_response)
+            if isinstance(token_data, dict):
+                for key in ("token", "access_token", "jwt", "auth_token"):
+                    token = token_data.get(key)
+                    if isinstance(token, str) and token:
+                        headers = {"Authorization": f"Bearer {token}", "x-access-token": token}
+                        me_response = self._request("GET", "/users/v1/me", headers=headers)
+                        me_data = self._as_json(me_response)
+                        if isinstance(me_data, dict):
+                            for admin_key in ("admin", "is_admin", "role"):
+                                value = me_data.get(admin_key)
+                                if admin_key == "role" and value in ("admin", "administrator"):
+                                    return True
+                                elif admin_key in ("admin", "is_admin") and value is True:
+                                    return True
+                        return False
+        except requests.RequestException:
+            pass
+        return False
 
     def _security_misconfiguration_findings(self, discovery: DiscoveryResult, auth: AuthContext) -> List[SecurityFinding]:
         probe_paths = list(self.settings.misconfiguration_probe_paths)
@@ -928,16 +1061,19 @@ class SecurityTestingAgent:
         return sorted(set(found))
 
     @staticmethod
-    def _response_refers_to_user(data: Any, user_id: int) -> bool:
+    def _response_refers_to_user(data: Any, user_identifier: Any) -> bool:
         if isinstance(data, dict):
             for key in ("user_id", "id", "uid"):
-                if str(data.get(key)) == str(user_id):
+                if str(data.get(key)) == str(user_identifier):
                     return True
-            return any(SecurityTestingAgent._response_refers_to_user(value, user_id) for value in data.values())
+            if isinstance(user_identifier, str) and "username" in data:
+                if str(data.get("username")) == str(user_identifier):
+                    return True
+            return any(SecurityTestingAgent._response_refers_to_user(value, user_identifier) for value in data.values())
         if isinstance(data, list):
-            return any(SecurityTestingAgent._response_refers_to_user(item, user_id) for item in data)
+            return any(SecurityTestingAgent._response_refers_to_user(item, user_identifier) for item in data)
         if isinstance(data, (str, int, float)):
-            return str(data) == str(user_id)
+            return str(data) == str(user_identifier)
         return False
 
     def _privilege_field_detected(self, data: Any, payload: Dict[str, Any]) -> bool:
@@ -996,12 +1132,49 @@ class SecurityTestingAgent:
         )
 
     def _enrich_findings_with_exploits(self, findings: List[SecurityFinding], auth: AuthContext) -> None:
+        """Enrich findings with both curl commands and live PoC results."""
+        from security_agent.exploit_generator import ExploitGenerator
+
+        generator = ExploitGenerator(
+            base_url=self.settings.normalized_base_url(),
+            request_delay=self.settings.request_delay_seconds,
+        )
+
+        try:
+            exploit_results = generator.generate_exploits(findings, auth.token)
+        except Exception as e:
+            self.audit_events.append(
+                {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "event": "exploit_generation_error",
+                    "error": str(e),
+                }
+            )
+            exploit_results = []
+
         for finding in findings:
             if finding.evidence.get("exploit_command"):
                 continue
             headers = dict(auth.headers) if auth.headers else {}
             exploit = self._build_exploit_command(finding.method, finding.endpoint, headers, finding)
             finding.evidence["exploit_command"] = exploit
+
+            related_results = [r for r in exploit_results if r.endpoint == finding.endpoint]
+            if related_results:
+                successful = [r for r in related_results if r.success]
+                finding.evidence["poc_results"] = {
+                    "total_attempts": len(related_results),
+                    "successful": len(successful),
+                    "sample_payloads": [
+                        {
+                            "payload": r.payload,
+                            "status": r.status_code,
+                            "success": r.success,
+                        }
+                        for r in related_results[:3]
+                    ],
+                }
+
 
     def _build_exploit_command(
         self, method: str, endpoint: str, headers: Dict[str, str], finding: SecurityFinding

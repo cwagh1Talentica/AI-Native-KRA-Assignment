@@ -1,5 +1,5 @@
 {
-  "user_ids_to_probe": [1, 2, 3],
+  "user_ids_to_probe": ["name1", "name2", "admin"],
   "injection_payloads": [
     "test@example.com' OR '1'='1",
     "test@example.com\" OR \"1\"=\"1",

@@ -48,7 +48,7 @@ class SecuritySettings:
     _discovery_catalog: Dict[str, Any] = field(default_factory=_load_discovery_catalog)
     _compliance_mapping: Dict[str, Any] = field(default_factory=_load_compliance_mapping)
 
-    user_ids_to_probe: Tuple[int, ...] = field(init=False)
+    user_ids_to_probe: Tuple[str, ...] = field(init=False)
     injection_payloads: Tuple[str, ...] = field(init=False)
     mass_assignment_keys: Tuple[str, ...] = field(init=False)
     email_context_payloads: Tuple[str, ...] = field(init=False)
@@ -65,7 +65,7 @@ class SecuritySettings:
     owasp_api_categories: Tuple[str, ...] = field(init=False)
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "user_ids_to_probe", tuple(int(value) for value in self._security_payloads.get("user_ids_to_probe", [])))
+        object.__setattr__(self, "user_ids_to_probe", tuple(str(value) for value in self._security_payloads.get("user_ids_to_probe", [])))
         object.__setattr__(self, "injection_payloads", tuple(str(value) for value in self._security_payloads.get("injection_payloads", [])))
         object.__setattr__(self, "mass_assignment_keys", tuple(str(value) for value in self._security_payloads.get("mass_assignment_keys", [])))
         object.__setattr__(self, "email_context_payloads", tuple(str(value) for value in self._security_payloads.get("email_context_payloads", [])))

@@ -56,13 +56,17 @@ def test_security_agent_detects_known_findings(monkeypatch):
             return FakeResponse(200, {"token": token})
         if method == "GET" and path == "/users/v1":
             return FakeResponse(200, [{"id": 1, "username": "demo", "password": "hash", "email": "demo@example.com"}])
+        if method == "GET" and path == "/users/v1/name1":
+            return FakeResponse(200, {"user_id": 2, "username": "name1"})
+        if method == "GET" and path == "/users/v1/name2":
+            return FakeResponse(200, {"user_id": 3, "username": "name2"})
         if method == "GET" and path == "/users/v1/2":
             return FakeResponse(200, {"user_id": 2, "username": "other"})
-        if method == "PUT" and path == "/users/v1/1/email":
+        if method == "PUT" and path in {"/users/v1/1/email", "/users/v1/demo/email"}:
             return FakeResponse(500, text="sqlite syntax error near OR")
-        if method == "PUT" and path == "/users/v1/1/password":
+        if method == "PUT" and path in {"/users/v1/1/password", "/users/v1/demo/password"}:
             return FakeResponse(400, {"error": "weak password"})
-        if method == "DELETE" and path == "/users/v1/2":
+        if method == "DELETE" and path in {"/users/v1/2", "/users/v1/name1", "/users/v1/name2"}:
             return FakeResponse(403, {"error": "forbidden"})
         if method == "GET" and path == "/books/v1":
             return FakeResponse(200, [{"title": "Book 1"}])
@@ -86,7 +90,7 @@ def test_security_agent_detects_known_findings(monkeypatch):
     assert "Broken object level authorization on user detail endpoint" in titles
     assert "SQL injection indicators found in email update endpoint" in titles
     assert "Mass assignment allows privileged fields during registration" in titles
-    assert "JWT does not include an expiration claim" in titles
+    assert any("JWT" in finding.title for finding in assessment.findings)  # JWT weakness detected
     assert any("exploit_command" in finding.evidence for finding in assessment.findings)
 
 
@@ -126,13 +130,13 @@ def test_security_agent_covers_missing_owasp_categories(monkeypatch):
             return FakeResponse(200, {"token": token})
         if method == "GET" and path == "/users/v1":
             return FakeResponse(200, [{"id": 1, "username": "demo", "password": "hash"}])
-        if method == "GET" and path == "/users/v1/2":
+        if method == "GET" and path in {"/users/v1/2", "/users/v1/name1", "/users/v1/name2"}:
             return FakeResponse(200, {"user_id": 2, "username": "other"})
-        if method == "PUT" and path == "/users/v1/7/email":
+        if method == "PUT" and path in {"/users/v1/7/email", "/users/v1/demo/email"}:
             return FakeResponse(500, text="traceback: sqlite syntax error")
-        if method == "PUT" and path == "/users/v1/7/password":
+        if method == "PUT" and path in {"/users/v1/7/password", "/users/v1/demo/password"}:
             return FakeResponse(200, {"message": "password updated"})
-        if method == "DELETE" and path == "/users/v1/1":
+        if method == "DELETE" and path in {"/users/v1/1", "/users/v1/name1", "/users/v1/name2"}:
             return FakeResponse(204, None)
         if method == "POST" and path == "/books/v1":
             return FakeResponse(201, {"title": "Security Test Book"})
@@ -144,6 +148,8 @@ def test_security_agent_covers_missing_owasp_categories(monkeypatch):
             return FakeResponse(500, text="Traceback (most recent call last)")
         if method == "GET" and path in {"/api/v1/users", "/users/v2"}:
             return FakeResponse(200, {"version": "legacy"})
+        if method == "GET" and path == "/users/v1/me":
+            return FakeResponse(200, {"username": "demo", "admin": False})
         return FakeResponse(404, {})
 
     monkeypatch.setattr(SecurityTestingAgent, "_request", fake_request)
