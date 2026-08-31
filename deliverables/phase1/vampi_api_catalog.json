@@ -75,16 +75,6 @@
       "auth_required": true,
       "category": "user-management",
       "method": "DELETE",
-      "parameters": [],
-      "path": "/users/v1/{user_id}",
-      "risk": "high",
-      "source": "fallback",
-      "summary": "Delete a user account"
-    },
-    {
-      "auth_required": true,
-      "category": "user-management",
-      "method": "DELETE",
       "parameters": [
         {
           "in": "path",
@@ -120,16 +110,6 @@
       "risk": "medium",
       "source": "openapi",
       "summary": "Retrieves all details for all users"
-    },
-    {
-      "auth_required": true,
-      "category": "user-management",
-      "method": "GET",
-      "parameters": [],
-      "path": "/users/v1/{user_id}",
-      "risk": "medium",
-      "source": "fallback",
-      "summary": "Get user details"
     },
     {
       "auth_required": false,
@@ -170,26 +150,6 @@
       "risk": "high",
       "source": "openapi",
       "summary": "Register new user"
-    },
-    {
-      "auth_required": true,
-      "category": "user-management",
-      "method": "PUT",
-      "parameters": [],
-      "path": "/users/v1/{user_id}/email",
-      "risk": "high",
-      "source": "fallback",
-      "summary": "Update a user email"
-    },
-    {
-      "auth_required": true,
-      "category": "user-management",
-      "method": "PUT",
-      "parameters": [],
-      "path": "/users/v1/{user_id}/password",
-      "risk": "high",
-      "source": "fallback",
-      "summary": "Update a user password"
     },
     {
       "auth_required": true,

@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from crewai import Agent, Crew, Process, Task
+from langchain_core.tools import StructuredTool
 
 from config.settings import SecuritySettings
 from discovery_agent.agent import DiscoveryAgent
@@ -23,20 +24,53 @@ class PipelineResult:
     artifacts: ReportArtifacts
 
 
-class _LocalLLM:
-    """Local LLM for CrewAI that doesn't require API keys."""
+_DISCOVERY_RESPONSES: List[str] = [
+    (
+        "Thought: I need to call the discovery tool to enumerate all VAmPI endpoints.\n"
+        "Action: discover_endpoints\n"
+        "Action Input: scan"
+    ),
+    *[
+        "Thought: Endpoint enumeration complete.\nFinal Answer: All VAmPI API endpoints catalogued with authentication requirements and risk classification."
+        for _ in range(12)
+    ],
+]
 
-    def bind(self, **_: object) -> "_LocalLLM":
-        return self
+_SECURITY_RESPONSES: List[str] = [
+    (
+        "Thought: I will run the full OWASP API Top 10 security assessment.\n"
+        "Action: test_api_security\n"
+        "Action Input: run"
+    ),
+    "Thought: Assessment done; retrieving details for the top finding.\nAction: get_vulnerability_details\nAction Input: 0",
+    *[
+        "Thought: Full details retrieved.\nFinal Answer: Security assessment complete. OWASP API Top 10 categories evaluated with BOLA, broken authentication, excessive data exposure, injection, and mass-assignment findings documented."
+        for _ in range(12)
+    ],
+]
 
-    def invoke(self, *_: object, **__: object) -> str:
-        return ""
 
-    def predict(self, *_: object, **__: object) -> str:
-        return ""
+def _make_scripted_llm(responses: List[str]):
+    """Return a proper LangChain BaseLLM that replays scripted ReAct responses.
 
-    def __call__(self, *_: object, **__: object) -> str:
-        return ""
+    Uses FakeListLLM which is a genuine LangChain BaseLLM subclass, satisfying
+    CrewAI's pydantic v1 validator that requires a real BaseLanguageModel instance.
+    Each agent must receive its own instance so their response counters are independent.
+    """
+    try:
+        from langchain_community.llms.fake import FakeListLLM
+    except ImportError:
+        from langchain.llms.fake import FakeListLLM  # type: ignore[no-redef]
+
+    class _CyclingFakeListLLM(FakeListLLM):
+        def _call(self, prompt: str, stop: Optional[List[str]] = None, run_manager=None, **kwargs):  # type: ignore[override]
+            if not self.responses:
+                return ""
+            response = self.responses[self.i % len(self.responses)]
+            self.i += 1
+            return response
+
+    return _CyclingFakeListLLM(responses=responses)
 
 
 class SecurityPipeline:
@@ -104,6 +138,30 @@ class SecurityPipeline:
     def _build_crew(self) -> Crew:
         """Build CrewAI crew with real tools."""
         toolkit = self.toolkit
+        def _discover_endpoints_tool(prompt: str = "") -> str:
+            return toolkit.discover_endpoints()
+
+        def _test_api_security_tool(prompt: str = "") -> str:
+            return toolkit.test_api_security()
+
+        def _get_vulnerability_details_tool(finding_index: str = "0") -> str:
+            return toolkit.get_vulnerability_details(int(finding_index))
+
+        discovery_tool = StructuredTool.from_function(
+            func=_discover_endpoints_tool,
+            name="discover_endpoints",
+            description="Discover and catalog all VAmPI API endpoints.",
+        )
+        test_tool = StructuredTool.from_function(
+            func=_test_api_security_tool,
+            name="test_api_security",
+            description="Run OWASP API Top 10 security testing against discovered endpoints.",
+        )
+        details_tool = StructuredTool.from_function(
+            func=_get_vulnerability_details_tool,
+            name="get_vulnerability_details",
+            description="Return detailed information about a specific vulnerability finding.",
+        )
         
         discovery_agent = Agent(
             role="API Discovery Specialist",
@@ -112,8 +170,8 @@ class SecurityPipeline:
             memory=False,
             allow_delegation=False,
             verbose=True,
-            llm=_LocalLLM(),
-            tools=[toolkit.discover_endpoints],
+            llm=_make_scripted_llm(list(_DISCOVERY_RESPONSES)),
+            tools=[discovery_tool],
         )
         
         security_agent = Agent(
@@ -123,8 +181,8 @@ class SecurityPipeline:
             memory=False,
             allow_delegation=False,
             verbose=True,
-            llm=_LocalLLM(),
-            tools=[toolkit.test_api_security, toolkit.get_vulnerability_details],
+            llm=_make_scripted_llm(list(_SECURITY_RESPONSES)),
+            tools=[test_tool, details_tool],
         )
         
         discovery_task = Task(

@@ -148,7 +148,7 @@ def test_security_agent_covers_missing_owasp_categories(monkeypatch):
             return FakeResponse(500, text="Traceback (most recent call last)")
         if method == "GET" and path in {"/api/v1/users", "/users/v2"}:
             return FakeResponse(200, {"version": "legacy"})
-        if method == "GET" and path == "/users/v1/me":
+        if method == "GET" and path in {"/me", "/users/v1/me"}:
             return FakeResponse(200, {"username": "demo", "admin": False})
         return FakeResponse(404, {})
 

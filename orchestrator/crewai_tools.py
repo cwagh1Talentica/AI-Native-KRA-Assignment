@@ -83,7 +83,7 @@ class CrewAIToolkit:
         details += f"  CVSS Score: {finding.cvss_score}\n"
         details += f"  Endpoint: {finding.method} {finding.endpoint}\n"
         details += f"  Remediation: {finding.remediation}\n"
-        details += f"  PoC: {finding.poc}\n"
+        details += f"  PoC: {finding.proof_of_concept}\n"
         return details
 
 

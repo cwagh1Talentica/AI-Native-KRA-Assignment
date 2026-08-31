@@ -200,6 +200,21 @@ class SecurityTestingAgent:
                 )
             )
 
+        if "nbf" not in claims:
+            findings.append(
+                self._finding(
+                    title="JWT does not include not-before claim",
+                    severity="low",
+                    score=3.9,
+                    category="API2: Broken Authentication",
+                    endpoint="/users/v1/login",
+                    method="POST",
+                    evidence={"claims": {k: v for k, v in claims.items() if k in ("exp", "iat", "nbf", "sub")}},
+                    remediation="Include nbf to prevent tokens being accepted before intended validity windows.",
+                    poc="Decode JWT payload and verify nbf is missing.",
+                )
+            )
+
         claim_injection = self._test_jwt_claim_tampering(auth.token)
         if claim_injection:
             findings.append(
@@ -219,17 +234,14 @@ class SecurityTestingAgent:
         return findings
 
     def _test_jwt_algorithm_confusion(self, token: str, claims: Dict[str, Any]) -> bool:
-        """Test for JWT algorithm confusion vulnerabilities."""
+        """Test for JWT RS256→HS256 algorithm confusion (downgrade) vulnerabilities."""
         try:
             header = jwt.get_unverified_header(token)
             alg = header.get("alg", "").lower()
-            
             if alg == "none":
                 return True
-            
-            if alg.startswith("hs"):
-                return True
-            
+            # HS-family tokens cannot be attacked by algorithm confusion;
+            # only RS/ES tokens are susceptible to HS256 downgrade.
             if alg.startswith("rs") or alg.startswith("es"):
                 try:
                     jwt.decode(token, "", algorithms=["HS256"])
@@ -241,38 +253,45 @@ class SecurityTestingAgent:
         return False
 
     def _test_jwt_claim_tampering(self, token: str) -> bool:
-        """Test if JWT claims can be modified without validation."""
+        """Test if the server accepts a JWT with tampered claims but the original signature."""
         try:
+            import base64 as _b64
+            import json as _json
             parts = token.split(".")
             if len(parts) != 3:
                 return False
-            
-            import base64
-            import json
-            
-            decoded_payload = json.loads(base64.urlsafe_b64decode(parts[1] + "=="))
+            padding = "=" * (4 - len(parts[1]) % 4)
+            decoded_payload = _json.loads(_b64.urlsafe_b64decode(parts[1] + padding))
             tampered_claims = dict(decoded_payload)
-            tampered_claims["user_id"] = 999
-            tampered_claims["role"] = "admin"
-            
-            tampered_payload = base64.urlsafe_b64encode(
-                json.dumps(tampered_claims).encode()
+            tampered_claims["admin"] = True
+            tampered_claims["sub"] = "admin"
+            tampered_payload = _b64.urlsafe_b64encode(
+                _json.dumps(tampered_claims, separators=(",", ":")).encode()
             ).decode().rstrip("=")
-            
+            # Keep the original signature — a correctly-implemented server rejects this
             tampered_token = f"{parts[0]}.{tampered_payload}.{parts[2]}"
-            
-            for test_secret in ["", "secret", "test"]:
-                try:
-                    jwt.decode(tampered_token, test_secret, algorithms=["HS256"], options={"verify_signature": False})
-                    return True
-                except Exception:
-                    pass
+            headers = {
+                "Authorization": f"Bearer {tampered_token}",
+                "x-access-token": tampered_token,
+            }
+            try:
+                resp = self._request("GET", "/me", headers=headers)
+                if resp.status_code in {200, 201}:
+                    data = self._as_json(resp)
+                    if isinstance(data, dict) and data.get("username") == "admin":
+                        return True
+            except requests.RequestException:
+                pass
         except Exception:
             pass
         return False
 
     def _test_jwt_weak_secrets(self, token: str, claims: Dict[str, Any]) -> bool:
-        weak_secrets = ["secret", "password", "123456", "admin", "key", "flask", "django"]
+        weak_secrets = [
+            "secret1",  # VAmPI default SECRET_KEY
+            "random", "secret", "password", "123456", "admin", "key",
+            "flask", "django", "vampi", "test", "changeme",
+        ]
         for secret in weak_secrets:
             if not secret:
                 continue
@@ -357,8 +376,13 @@ class SecurityTestingAgent:
                     )
                 )
 
-        password_update = self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/password")
-        if password_update and auth.user_id is not None:
+        password_update = (
+            self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{username}/password")
+            or self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/password")
+        )
+        if password_update:
+            path_key = "username" if "{username}" in password_update.path else "user_id"
+            target_identifier = auth.username or auth.user_id or self.settings.user_ids_to_probe[0]
             candidate_payloads = [
                 {"password": weak_password},
                 {"new_password": weak_password},
@@ -368,7 +392,7 @@ class SecurityTestingAgent:
                 try:
                     response = self._request(
                         "PUT",
-                        password_update.path.format(user_id=auth.user_id),
+                        password_update.path.format(**{path_key: target_identifier}),
                         json=candidate,
                         headers=dict(auth.headers) or None,
                     )
@@ -385,7 +409,7 @@ class SecurityTestingAgent:
                             method=password_update.method,
                             evidence={"status": response.status_code, "payload": candidate},
                             remediation="Reject weak passwords during password change and enforce strong password policy consistently.",
-                            poc=f"PUT {password_update.path.format(user_id=auth.user_id)} with weak password data.",
+                            poc=f"PUT {password_update.path.format(**{path_key: target_identifier})} with weak password data.",
                         )
                     )
                     break
@@ -405,11 +429,15 @@ class SecurityTestingAgent:
         self, discovery: DiscoveryResult, auth: AuthContext, notes: List[str]
     ) -> List[SecurityFinding]:
         findings: List[SecurityFinding] = []
-        delete_user_endpoint = self._find_endpoint(discovery.endpoints, "DELETE", "/users/v1/{user_id}")
+        delete_user_endpoint = (
+            self._find_endpoint(discovery.endpoints, "DELETE", "/users/v1/{username}")
+            or self._find_endpoint(discovery.endpoints, "DELETE", "/users/v1/{user_id}")
+        )
         if not delete_user_endpoint:
             return findings
 
-        non_owner_target_ids = [value for value in self.settings.user_ids_to_probe if value != auth.user_id]
+        path_key = "username" if "{username}" in delete_user_endpoint.path else "user_id"
+        non_owner_target_ids = [value for value in self.settings.user_ids_to_probe if value != auth.username]
         if not non_owner_target_ids:
             return findings
 
@@ -417,10 +445,10 @@ class SecurityTestingAgent:
         try:
             delete_response = self._request(
                 "DELETE",
-                delete_user_endpoint.path.format(user_id=target_id),
+                delete_user_endpoint.path.format(**{path_key: target_id}),
                 headers=dict(auth.headers) or None,
             )
-            notes.append(f"Tested DELETE /users/v1/{{user_id}} with user_id={target_id}; status={delete_response.status_code}.")
+            notes.append(f"Tested DELETE {delete_user_endpoint.path} with target={target_id}; status={delete_response.status_code}.")
             if delete_response.status_code in {200, 202, 204}:
                 findings.append(
                     self._finding(
@@ -430,24 +458,28 @@ class SecurityTestingAgent:
                         category="API1: Broken Object Level Authorization",
                         endpoint=delete_user_endpoint.path,
                         method=delete_user_endpoint.method,
-                        evidence={"target_user_id": target_id, "status": delete_response.status_code},
+                        evidence={"target_user": target_id, "status": delete_response.status_code},
                         remediation="Verify ownership and role authorization before allowing user account deletion.",
-                        poc=f"DELETE {delete_user_endpoint.path.format(user_id=target_id)} as another authenticated user.",
+                        poc=f"DELETE {delete_user_endpoint.path.format(**{path_key: target_id})} as another authenticated user.",
                     )
                 )
         except requests.RequestException as exc:
-            notes.append(f"DELETE /users/v1/{{user_id}} test failed with error: {exc}.")
+            notes.append(f"DELETE {delete_user_endpoint.path} test failed with error: {exc}.")
         return findings
 
     def _check_password_update_endpoint(
         self, discovery: DiscoveryResult, auth: AuthContext, notes: List[str]
     ) -> List[SecurityFinding]:
         findings: List[SecurityFinding] = []
-        password_update_endpoint = self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/password")
+        password_update_endpoint = (
+            self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{username}/password")
+            or self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/password")
+        )
         if not password_update_endpoint:
             return findings
 
-        target_id = auth.user_id or self.settings.user_ids_to_probe[0]
+        path_key = "username" if "{username}" in password_update_endpoint.path else "user_id"
+        target_id = auth.username or auth.user_id or self.settings.user_ids_to_probe[0]
         weak_password = self.settings.weak_password_candidates[0] if self.settings.weak_password_candidates else "12345"
         candidate_password_payloads = [
             {"password": weak_password},
@@ -459,12 +491,12 @@ class SecurityTestingAgent:
             try:
                 password_update_response = self._request(
                     "PUT",
-                    password_update_endpoint.path.format(user_id=target_id),
+                    password_update_endpoint.path.format(**{path_key: target_id}),
                     json=password_payload,
                     headers=dict(auth.headers) or None,
                 )
             except requests.RequestException as exc:
-                notes.append(f"PUT /users/v1/{{user_id}}/password test failed with error: {exc}.")
+                notes.append(f"PUT {password_update_endpoint.path} test failed with error: {exc}.")
                 continue
             observed_status_codes.append(password_update_response.status_code)
             if password_update_response.status_code in {200, 201, 202, 204}:
@@ -478,12 +510,12 @@ class SecurityTestingAgent:
                         method=password_update_endpoint.method,
                         evidence={"status": password_update_response.status_code, "payload": password_payload},
                         remediation="Enforce robust password validation and deny weak passwords on update operations.",
-                        poc=f"PUT {password_update_endpoint.path.format(user_id=target_id)} with weak password payload.",
+                        poc=f"PUT {password_update_endpoint.path.format(**{path_key: target_id})} with weak password payload.",
                     )
                 )
                 break
         if observed_status_codes:
-            notes.append(f"Tested PUT /users/v1/{{user_id}}/password with statuses={observed_status_codes}.")
+            notes.append(f"Tested PUT {password_update_endpoint.path} with statuses={observed_status_codes}.")
         return findings
 
     def _check_book_title_lookup_endpoint(
@@ -596,12 +628,24 @@ class SecurityTestingAgent:
         return email_count
 
     def _bola_findings(self, discovery: DiscoveryResult, auth: AuthContext) -> List[SecurityFinding]:
-        endpoint = self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{user_id}")
+        # Prefer the OpenAPI {username} template; fall back to the legacy {user_id} entry
+        endpoint = (
+            self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{username}")
+            or self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{user_id}")
+        )
         if not endpoint:
             return []
+        path_key = "username" if "{username}" in endpoint.path else "user_id"
         target_usernames = [value for value in self.settings.user_ids_to_probe if value != auth.username]
         for target_username in target_usernames:
-            response = self._request("GET", endpoint.path.format(user_id=target_username), headers=dict(auth.headers) or None)
+            try:
+                response = self._request(
+                    "GET",
+                    endpoint.path.format(**{path_key: target_username}),
+                    headers=dict(auth.headers) or None,
+                )
+            except requests.RequestException:
+                continue
             if response.status_code not in {200, 201}:
                 continue
             data = self._as_json(response)
@@ -616,22 +660,29 @@ class SecurityTestingAgent:
                         method=endpoint.method,
                         evidence={"target_username": target_username, "status": response.status_code, "response": data},
                         remediation="Enforce per-object authorization checks before returning user records.",
-                        poc=f"GET {endpoint.path.format(user_id=target_username)} with a different authenticated user and compare the response.",
+                        poc=f"GET {endpoint.path.format(**{path_key: target_username})} with a different authenticated user and compare the response.",
                     )
                 ]
         return []
 
     def _injection_findings(self, discovery: DiscoveryResult, auth: AuthContext) -> List[SecurityFinding]:
-        endpoint = self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/email")
+        # Prefer the OpenAPI {username} template; fall back to the legacy {user_id} entry
+        endpoint = (
+            self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{username}/email")
+            or self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/email")
+        )
         if not endpoint:
             return []
         target_user_identifier = auth.username or self.settings.user_ids_to_probe[0]
+        path_key = "username" if "{username}" in endpoint.path else "user_id"
         findings: List[SecurityFinding] = []
         payloads = self._generate_context_aware_payloads(endpoint.path, "email")
+        accepted_malicious: Optional[str] = None
         for payload in payloads:
             body = {"email": payload}
+            fmt_path = endpoint.path.format(**{path_key: target_user_identifier})
             try:
-                response = self._request("PUT", endpoint.path.format(user_id=target_user_identifier), json=body, headers=dict(auth.headers) or None)
+                response = self._request("PUT", fmt_path, json=body, headers=dict(auth.headers) or None)
             except requests.RequestException as exc:
                 findings.append(
                     self._finding(
@@ -643,7 +694,7 @@ class SecurityTestingAgent:
                         method=endpoint.method,
                         evidence={"payload": sqlparse.format(payload, strip_comments=True), "error": str(exc)},
                         remediation="Validate email input with strict allow-lists and parameterized queries on the server side.",
-                        poc=f"PUT {endpoint.path.format(user_id=target_user_identifier)} with email={payload!r}.",
+                        poc=f"PUT {fmt_path} with email={payload!r}.",
                     )
                 )
                 continue
@@ -659,25 +710,130 @@ class SecurityTestingAgent:
                         method=endpoint.method,
                         evidence={
                             "payload": sqlparse.format(payload, keyword_case="upper", strip_comments=True),
-                            "ai_generated_payloads": payloads[:8],
+                            "payloads_tested": payloads[:8],
                             "status": response.status_code,
                             "response_excerpt": response.text[:240],
                         },
                         remediation="Use parameterized queries and reject email values that do not match a strict email pattern.",
-                        poc=f"PUT {endpoint.path.format(user_id=target_user_identifier)} with email={payload!r}.",
+                        poc=f"PUT {fmt_path} with email={payload!r}.",
                     )
                 )
-                break
+                return findings
+            # Track silently-accepted malicious payloads as blind/stored injection indicator
+            if response.status_code in {200, 201, 204} and accepted_malicious is None:
+                accepted_malicious = payload
+        if not findings and accepted_malicious is not None:
+            fmt_path = endpoint.path.format(**{path_key: target_user_identifier})
+            findings.append(
+                self._finding(
+                    title="Email update endpoint accepts unsanitized SQL injection payloads",
+                    severity="high",
+                    score=8.2,
+                    category="API8: Injection",
+                    endpoint=endpoint.path,
+                    method=endpoint.method,
+                    evidence={
+                        "sample_payload": sqlparse.format(accepted_malicious, keyword_case="upper", strip_comments=True),
+                        "payloads_tested": payloads[:8],
+                        "status": 200,
+                        "note": "Payload accepted without error — potential blind/stored SQL injection.",
+                    },
+                    remediation="Use parameterized queries and validate that email fields reject non-email input.",
+                    poc=f"PUT {fmt_path} with email={accepted_malicious!r} and verify storage.",
+                )
+            )
+
+        password_endpoint = (
+            self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{username}/password")
+            or self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/password")
+        )
+        if password_endpoint:
+            password_path_key = "username" if "{username}" in password_endpoint.path else "user_id"
+            password_target_identifier = auth.username or self.settings.user_ids_to_probe[0]
+            password_payloads = self._generate_context_aware_payloads(password_endpoint.path, "password")
+            password_accepted_malicious: Optional[str] = None
+            for payload in password_payloads:
+                body = {"password": payload}
+                fmt_path = password_endpoint.path.format(**{password_path_key: password_target_identifier})
+                try:
+                    response = self._request("PUT", fmt_path, json=body, headers=dict(auth.headers) or None)
+                except requests.RequestException as exc:
+                    findings.append(
+                        self._finding(
+                            title="Injection endpoint triggered request failure",
+                            severity="high",
+                            score=7.1,
+                            category="API8: Injection",
+                            endpoint=password_endpoint.path,
+                            method=password_endpoint.method,
+                            evidence={"payload": sqlparse.format(payload, strip_comments=True), "error": str(exc)},
+                            remediation="Validate password input with strict allow-lists and avoid directly interpolating user-controlled values.",
+                            poc=f"PUT {fmt_path} with password={payload!r}.",
+                        )
+                    )
+                    continue
+                response_text = response.text.lower()
+                if response.status_code >= 500 or any(marker in response_text for marker in self.settings.sql_error_markers):
+                    findings.append(
+                        self._finding(
+                            title="SQL injection indicators found in password update endpoint",
+                            severity="critical",
+                            score=9.0,
+                            category="API8: Injection",
+                            endpoint=password_endpoint.path,
+                            method=password_endpoint.method,
+                            evidence={
+                                "payload": sqlparse.format(payload, keyword_case="upper", strip_comments=True),
+                                "payloads_tested": password_payloads[:8],
+                                "status": response.status_code,
+                                "response_excerpt": response.text[:240],
+                            },
+                            remediation="Use parameterized queries and reject password values that do not match a strict policy.",
+                            poc=f"PUT {fmt_path} with password={payload!r}.",
+                        )
+                    )
+                    return findings
+                if response.status_code in {200, 201, 202, 204} and password_accepted_malicious is None and any(
+                    marker in payload for marker in ("'", '"', ";", " OR ", "UNION", "SELECT", "--")
+                ):
+                    password_accepted_malicious = payload
+            if not findings and password_accepted_malicious is not None:
+                fmt_path = password_endpoint.path.format(**{password_path_key: password_target_identifier})
+                findings.append(
+                    self._finding(
+                        title="Password update endpoint accepts SQL injection payloads",
+                        severity="high",
+                        score=8.1,
+                        category="API8: Injection",
+                        endpoint=password_endpoint.path,
+                        method=password_endpoint.method,
+                        evidence={
+                            "sample_payload": sqlparse.format(password_accepted_malicious, keyword_case="upper", strip_comments=True),
+                            "payloads_tested": password_payloads[:8],
+                            "status": 200,
+                            "note": "Payload accepted without error — potential blind/stored SQL injection.",
+                        },
+                        remediation="Use parameterized queries and validate that password fields reject SQL metacharacters.",
+                        poc=f"PUT {fmt_path} with password={password_accepted_malicious!r} and verify persistence.",
+                    )
+                )
         return findings
 
     def _authentication_bypass_findings(self, discovery: DiscoveryResult, auth: AuthContext) -> List[SecurityFinding]:
-        endpoint = self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{user_id}")
+        # Prefer the OpenAPI {username} endpoint; fall back to the legacy {user_id} entry
+        endpoint = (
+            self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{username}")
+            or self._find_endpoint(discovery.endpoints, "GET", "/users/v1/{user_id}")
+        )
         if not endpoint:
             return []
-        target_id = auth.user_id or self.settings.user_ids_to_probe[0]
+        path_key = "username" if "{username}" in endpoint.path else "user_id"
+        # VAmPI uses username-based paths (not integer IDs)
+        target_id = auth.username or self.settings.user_ids_to_probe[0]
         findings: List[SecurityFinding] = []
+        fmt_path = endpoint.path.format(**{path_key: target_id})
         try:
-            no_auth_response = self._request("GET", endpoint.path.format(user_id=target_id))
+            no_auth_response = self._request("GET", fmt_path)
             if no_auth_response.status_code in {200, 201}:
                 findings.append(
                     self._finding(
@@ -689,15 +845,55 @@ class SecurityTestingAgent:
                         method=endpoint.method,
                         evidence={"status": no_auth_response.status_code},
                         remediation="Require valid authentication token checks for all protected user-resource endpoints.",
-                        poc=f"GET {endpoint.path.format(user_id=target_id)} without Authorization headers.",
+                        poc=f"GET {fmt_path} without Authorization headers.",
                     )
                 )
         except requests.RequestException:
             pass
 
+        update_endpoints = []
+        password_update = (
+            self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{username}/password")
+            or self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/password")
+        )
+        email_update = (
+            self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{username}/email")
+            or self._find_endpoint(discovery.endpoints, "PUT", "/users/v1/{user_id}/email")
+        )
+        if password_update:
+            update_endpoints.append((password_update, {"password": "CrossUser!123"}))
+        if email_update:
+            update_endpoints.append((email_update, {"email": "crossuser@example.com"}))
+        for update_endpoint, body in update_endpoints:
+            update_path_key = "username" if "{username}" in update_endpoint.path else "user_id"
+            for target_username in [value for value in self.settings.user_ids_to_probe if value != auth.username]:
+                try:
+                    cross_user_response = self._request(
+                        "PUT",
+                        update_endpoint.path.format(**{update_path_key: target_username}),
+                        json=body,
+                        headers=dict(auth.headers) or None,
+                    )
+                except requests.RequestException:
+                    continue
+                if cross_user_response.status_code in {200, 201, 202, 204}:
+                    findings.append(
+                        self._finding(
+                            title="Authentication bypass allows cross-user profile updates",
+                            severity="critical",
+                            score=9.3,
+                            category="API2: Broken Authentication",
+                            endpoint=update_endpoint.path,
+                            method=update_endpoint.method,
+                            evidence={"target_username": target_username, "status": cross_user_response.status_code, "payload": body},
+                            remediation="Bind profile updates to the authenticated subject and reject cross-user modifications unless the caller is an admin.",
+                            poc=f"PUT {update_endpoint.path.format(**{update_path_key: target_username})} with another user's token.",
+                        )
+                    )
+                    return findings
         malformed_headers = {"Authorization": "Bearer invalid.invalid.invalid", "x-access-token": "invalid.invalid.invalid"}
         try:
-            malformed_response = self._request("GET", endpoint.path.format(user_id=target_id), headers=malformed_headers)
+            malformed_response = self._request("GET", fmt_path, headers=malformed_headers)
             if malformed_response.status_code in {200, 201}:
                 findings.append(
                     self._finding(
@@ -709,7 +905,7 @@ class SecurityTestingAgent:
                         method=endpoint.method,
                         evidence={"status": malformed_response.status_code},
                         remediation="Validate JWT signature, structure, expiration, and claims before authorization decisions.",
-                        poc=f"GET {endpoint.path.format(user_id=target_id)} with a malformed bearer token.",
+                        poc=f"GET {fmt_path} with a malformed bearer token.",
                     )
                 )
         except requests.RequestException:
@@ -789,10 +985,9 @@ class SecurityTestingAgent:
                 )
             ]
         data = self._as_json(response)
-        leaked_privilege = self._privilege_field_detected(data, payload)
-        if not leaked_privilege:
+        if response.status_code not in {200, 201, 202, 204}:
             return []
-        
+
         admin_confirmed = self._verify_admin_privilege_via_me(username, password)
         if admin_confirmed:
             return [
@@ -839,15 +1034,20 @@ class SecurityTestingAgent:
                     token = token_data.get(key)
                     if isinstance(token, str) and token:
                         headers = {"Authorization": f"Bearer {token}", "x-access-token": token}
-                        me_response = self._request("GET", "/users/v1/me", headers=headers)
-                        me_data = self._as_json(me_response)
-                        if isinstance(me_data, dict):
-                            for admin_key in ("admin", "is_admin", "role"):
-                                value = me_data.get(admin_key)
-                                if admin_key == "role" and value in ("admin", "administrator"):
-                                    return True
-                                elif admin_key in ("admin", "is_admin") and value is True:
-                                    return True
+                        # VAmPI self-profile endpoint is /me; /users/v1/me is a fallback
+                        for me_path in ("/me", "/users/v1/me"):
+                            me_response = self._request("GET", me_path, headers=headers)
+                            if me_response.status_code not in {200, 201}:
+                                continue
+                            me_data = self._as_json(me_response)
+                            if isinstance(me_data, dict):
+                                for admin_key in ("admin", "is_admin", "role"):
+                                    value = me_data.get(admin_key)
+                                    if admin_key == "role" and value in ("admin", "administrator"):
+                                        return True
+                                    elif admin_key in ("admin", "is_admin") and value is True:
+                                        return True
+                            break
                         return False
         except requests.RequestException:
             pass

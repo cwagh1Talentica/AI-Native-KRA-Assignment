@@ -45,7 +45,7 @@ def main() -> int:
     deliverables_dir = Path(args.deliverables_dir)
 
     if args.phase == "1":
-        discovery = pipeline.discovery_agent.discover()
+        discovery = pipeline.discovery_agent_impl.discover()
         output_path = deliverables_dir / "phase1" / "vampi_api_catalog.json"
         _write_json(output_path, discovery.to_dict())
         print("Phase 1 complete")
@@ -54,8 +54,8 @@ def main() -> int:
         return 0
 
     if args.phase == "2":
-        discovery = pipeline.discovery_agent.discover()
-        assessment = pipeline.security_agent.assess(discovery)
+        discovery = pipeline.discovery_agent_impl.discover()
+        assessment = pipeline.security_agent_impl.assess(discovery)
         output_path = deliverables_dir / "phase2" / "vampi_vulnerability_assessment.json"
         _write_json(
             output_path,
